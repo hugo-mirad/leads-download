@@ -1,0 +1,24 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Leads_App_Present", "Leads_App\Leads_App_Present.csproj", "{361A733F-CE4C-4B2A-8DAA-10A8FDBB5EB9}"
+EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "LeadsSetup", "LeadsSetup\LeadsSetup.vdproj", "{7BD87B80-9F2E-4E58-A935-46E29EBAAC4A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{361A733F-CE4C-4B2A-8DAA-10A8FDBB5EB9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{361A733F-CE4C-4B2A-8DAA-10A8FDBB5EB9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{361A733F-CE4C-4B2A-8DAA-10A8FDBB5EB9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{361A733F-CE4C-4B2A-8DAA-10A8FDBB5EB9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7BD87B80-9F2E-4E58-A935-46E29EBAAC4A}.Debug|Any CPU.ActiveCfg = Debug
+		{7BD87B80-9F2E-4E58-A935-46E29EBAAC4A}.Release|Any CPU.ActiveCfg = Release
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
