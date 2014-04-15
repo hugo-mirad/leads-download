@@ -73,7 +73,7 @@ namespace Leads_App
         }
 
         public void SaveLead_Craigslist(string Price, string Model, string Description, string Url, string sPosting,
-                                        string CollectedFromState, string PhoneNo, int StaeId, string State_Name, string CusEmailId)
+                                        string CollectedFromState, string PhoneNo, int StaeId, string State_Name, string year)
         {
             DataSet ds = new DataSet();
             try
@@ -102,13 +102,13 @@ namespace Leads_App
                 cmd.Parameters.Add(new SqlParameter("@Model", Model));
                 cmd.Parameters.Add(new SqlParameter("@Description", Description));
                 cmd.Parameters.Add(new SqlParameter("@Url", Url));
-                cmd.Parameters.Add(new SqlParameter("@PostingId", sPosting));
+                //cmd.Parameters.Add(new SqlParameter("@PostingId", sPosting));
                 cmd.Parameters.Add(new SqlParameter("@CollectedFromState", CollectedFromState));
                 cmd.Parameters.Add(new SqlParameter("@PhoneNo", PhoneNo));
                 cmd.Parameters.Add(new SqlParameter("@StaeId", StaeId));
                 cmd.Parameters.Add(new SqlParameter("@State_Name", State_Name));
                 cmd.Parameters.Add(new SqlParameter("@sysName", sysName));
-                cmd.Parameters.Add(new SqlParameter("@CusEmailId", CusEmailId));
+                cmd.Parameters.Add(new SqlParameter("@Year", year));
                 //cmd.Parameters.Add(new SqlParameter("@StateCode", StateCode));
 
                 cmd.ExecuteNonQuery();

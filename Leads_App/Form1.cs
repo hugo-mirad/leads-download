@@ -892,12 +892,9 @@ namespace Leads_App
         public void GetLeadsForcraigslist(string StateN, string CityN, int StateID)
         {
             varcount = 0;
-            int urlNums = 26;
-            int a = 0, b = 0; string Modellist1 = "";
+            int urlNums = 26; int a = 0, b = 0; string Modellist1 = "";
             string sprice = ""; string sPosting = "  "; string CollectedFromState = "";
-            string CusEmailId = string.Empty;
-            string date = "";
-
+            string CusEmailId = ""; string date = ""; string year = ""; string yearCar = "";
             string mainURL = ConfigurationManager.AppSettings["MainUrlCraigslist"].ToString();
             {
                 mainURL = "http://" + StateN + ".craigslist.org/cto";
@@ -906,519 +903,458 @@ namespace Leads_App
             {
                 for (int j = 0; j <= urlNums; j++)
                 {
-                    if (stopclo)
+                    try
                     {
-                        a = (j) * 100;
-                        if (CCityNames.Text != "")
+                        if (stopclo)
                         {
-                            if (a == 0)
+
+                            #region if
+                            a = (j) * 100;
+                            if (CCityNames.Text != "")
                             {
-                                mainURL = "http://" + CityN + ".craigslist.org/search/cto?query=&srchType=A&minAsk=2500";
-                                //  http://abilene.craigslist.org/search/cto?query=&srchType=T&minAsk=4000&maxAsk=
+                                if (a == 0)
+                                {
+                                    mainURL = "http://" + CityN + ".craigslist.org/search/cto?query=&srchType=A&minAsk=2500";
+                                    //  http://abilene.craigslist.org/search/cto?query=&srchType=T&minAsk=4000&maxAsk=
+                                }
+                                else
+                                {
+                                    mainURL = "http://" + CityN + ".craigslist.org/search/cto?query=&srchType=A&minAsk=2500&s=" + a + "";
+                                    //  http://abilene.craigslist.org/search/cto?query=&srchType=T&minAsk=4000&maxAsk=&s=100
+                                }
                             }
                             else
                             {
-                                mainURL = "http://" + CityN + ".craigslist.org/search/cto?query=&srchType=A&minAsk=2500&s=" + a + "";
-                                //  http://abilene.craigslist.org/search/cto?query=&srchType=T&minAsk=4000&maxAsk=&s=100
+                                mainURL = "http://" + StateN + ".craigslist.org/search/cto?query=&srchType=T&minAsk=2500";
                             }
-                        }
-                        else
-                        {
-                            mainURL = "http://" + StateN + ".craigslist.org/search/cto?query=&srchType=T&minAsk=2500";
-                        }
-                        FillCurrentPageData(mainURL);
-                        String str = string.Empty;
+                            FillCurrentPageData(mainURL);
+                            String str = string.Empty;
 
-                        Regex regexindividual = new Regex("<span class=\"pl\">(.*?)</span>(.*?)</span>(.*?)</span>(.*?)</span>");
-                        System.Collections.ArrayList individualCararraylist = new System.Collections.ArrayList();
-                        str = content;
-                        str = content.Replace('\n', ' ');
-                        System.Text.RegularExpressions.MatchCollection regexindividualCollec = null;
-                        regexindividualCollec = regexindividual.Matches(str);
-                        individualCararraylist.Clear();
-                        individualCararraylist.InsertRange(individualCararraylist.Count, regexindividualCollec);
-
-                        for (int x = 0; x < individualCararraylist.Count; x++)
-                        {
-                            if (stopclo)
+                            Regex regexindividual = new Regex("<span class=\"pl\">(.*?)</span>(.*?)</span>(.*?)</span>(.*?)</span>");
+                            System.Collections.ArrayList individualCararraylist = new System.Collections.ArrayList();
+                            str = content;
+                            str = content.Replace('\n', ' ');
+                            System.Text.RegularExpressions.MatchCollection regexindividualCollec = null;
+                            regexindividualCollec = regexindividual.Matches(str);
+                            individualCararraylist.Clear();
+                            individualCararraylist.InsertRange(individualCararraylist.Count, regexindividualCollec);
+                            if (individualCararraylist.Count > 0)
                             {
-                                Regex dateregex = new Regex("<span class=\"date\">(.*?)</span>");
-                                System.Collections.ArrayList datelist = new System.Collections.ArrayList();
-                                str = individualCararraylist[x].ToString();
-                                str = str.Replace('\n', ' ');
-                                System.Text.RegularExpressions.MatchCollection dateregexmatch = null;
-                                dateregexmatch = dateregex.Matches(str);
-                                datelist.Clear();
-                                datelist.InsertRange(datelist.Count, dateregexmatch);
-                                for (int abc = 0; abc < datelist.Count; abc++)
+                                for (int x = 0; x < individualCararraylist.Count; x++)
                                 {
-                                    date = datelist[abc].ToString().Replace("<span class=\"date\">", "");
-                                    date = date.Replace("</span>", "");
-                                    DateTime new1 = DateTime.Parse(date);
-                                    new1 = new1.Date + ts;
-                                    if (!(new1 >= edate && new1 <= sdate))
+                                    if (stopclo)
                                     {
-                                        return;
-                                    }
-                                    else
-                                    {
-                                        #region for
-                                        String SubURL3 = individualCararraylist[x].ToString();
-                                        int tindex = SubURL3.IndexOf("<a href=");
-                                        int etindex = SubURL3.Length;
-                                        string SubURL1 = SubURL3.ToString().Substring(tindex, etindex - tindex);
-                                        int tindex1 = SubURL1.IndexOf("\"");
-                                        int etindex1 = SubURL1.IndexOf(">");
-                                        string SubURL2 = SubURL1.ToString().Substring(tindex1, etindex1 - tindex1);
-                                        string sMainUrl = SubURL2.Replace("\"", "");
-                                        sMainUrl = "http://" + CityN + ".craigslist.org" + sMainUrl;
-                                        FillCurrentPageData(sMainUrl);
-                                        string Details = string.Empty;
-                                        Regex CarData = new Regex("<section id=\"postingbody\">(.*?)</section>");
-                                        // Regex CarData = new Regex("<section class=\"userbody\">(.*?)</section>(.*?)</section>(.*?)</section>");
-                                        System.Collections.ArrayList individualpnslyvmailarraylistURL = new System.Collections.ArrayList();
-                                        Details = content;
-                                        Details = content.Replace('\n', ' ');
-                                        System.Text.RegularExpressions.MatchCollection regexindividualpnslyvmailCollecURL = null;
-                                        regexindividualpnslyvmailCollecURL = CarData.Matches(Details);
-                                        individualpnslyvmailarraylistURL.Clear();
-                                        individualpnslyvmailarraylistURL.InsertRange(individualpnslyvmailarraylistURL.Count, regexindividualpnslyvmailCollecURL);
-                                        string vehicleDesc = string.Empty;
-                                        if (individualpnslyvmailarraylistURL.Count != 0)
+                                        #region if
+                                        Regex dateregex = new Regex("<span class=\"date\">(.*?)</span>");
+                                        System.Collections.ArrayList datelist = new System.Collections.ArrayList();
+                                        str = individualCararraylist[x].ToString();
+                                        str = str.Replace('\n', ' ');
+                                        System.Text.RegularExpressions.MatchCollection dateregexmatch = null;
+                                        dateregexmatch = dateregex.Matches(str);
+                                        datelist.Clear();
+                                        datelist.InsertRange(datelist.Count, dateregexmatch);
+                                        for (int abc = 0; abc < datelist.Count; abc++)
                                         {
-                                            vehicleDesc = individualpnslyvmailarraylistURL[0].ToString().Replace("<section id=\"postingbody\">", "");
-                                            vehicleDesc = vehicleDesc.Replace("</section>", "");
-                                            vehicleDesc = vehicleDesc.Replace("\t", "");
-                                            vehicleDesc = vehicleDesc.Replace("<br>", "");
-                                            vehicleDesc = vehicleDesc.Replace("=&gt;", "");//.Trim();
-                                        }
-                                        string sentence = vehicleDesc;//.Replace(" ","").Trim();
-                                        string[] digits = Regex.Split(sentence, @"\D+");
-                                        string PhoneNumber = string.Empty;
-
-                                        for (int p = 0; p < digits.Length; p++)
-                                        {
-                                            if (digits[p].Length == 10)
+                                            date = datelist[abc].ToString().Replace("<span class=\"date\">", "");
+                                            date = date.Replace("</span>", "");
+                                            DateTime new1 = DateTime.Parse(date);
+                                            new1 = new1.Date + ts;
+                                            if (!(new1 >= edate && new1 <= sdate))
                                             {
-                                                if (sPosting == PhoneNumber)
+                                                return;
+                                            }
+                                            else
+                                            {
+                                                #region for
+                                                String SubURL3 = individualCararraylist[x].ToString();
+                                                int tindex = SubURL3.IndexOf("<a href=");
+                                                int etindex = SubURL3.Length;
+                                                string SubURL1 = SubURL3.ToString().Substring(tindex, etindex - tindex);
+                                                int tindex1 = SubURL1.IndexOf("\"");
+                                                int etindex1 = SubURL1.IndexOf(">");
+                                                string SubURL2 = SubURL1.ToString().Substring(tindex1, etindex1 - tindex1);
+                                                string sMainUrl = SubURL2.Replace("\"", "");
+                                                sMainUrl = "http://" + CityN + ".craigslist.org" + sMainUrl;
+                                                FillCurrentPageData(sMainUrl);
+                                                string Details = string.Empty;
+                                                Regex CarData = new Regex("<section id=\"postingbody\">(.*?)</section>");
+                                                System.Collections.ArrayList individualpnslyvmailarraylistURL = new System.Collections.ArrayList();
+                                                Details = content;
+                                                Details = content.Replace('\n', ' ');
+                                                System.Text.RegularExpressions.MatchCollection regexindividualpnslyvmailCollecURL = null;
+                                                regexindividualpnslyvmailCollecURL = CarData.Matches(Details);
+                                                individualpnslyvmailarraylistURL.Clear();
+                                                individualpnslyvmailarraylistURL.InsertRange(individualpnslyvmailarraylistURL.Count, regexindividualpnslyvmailCollecURL);
+                                                string vehicleDesc = string.Empty;
+                                                if (individualpnslyvmailarraylistURL.Count != 0)
                                                 {
-                                                    PhoneNumber = "";
+                                                    vehicleDesc = individualpnslyvmailarraylistURL[0].ToString().Replace("<section id=\"postingbody\">", "");
+                                                    vehicleDesc = vehicleDesc.Replace("</section>", "");
+                                                    vehicleDesc = vehicleDesc.Replace("\t", "");
+                                                    vehicleDesc = vehicleDesc.Replace("<br>", "");
+                                                    vehicleDesc = vehicleDesc.Replace("=&gt;", "");//.Trim();
                                                 }
-                                                else
+                                                string sentence = vehicleDesc;//.Replace(" ","").Trim();
+                                                sentence = sentence.ToLower(); sentence = sentence.Replace(" ", "").Trim();
+                                                sentence = sentence.Replace("one", "1"); sentence = sentence.Replace("two", "2"); sentence = sentence.Replace("three", "3");
+                                                sentence = sentence.Replace("four", "4"); sentence = sentence.Replace("five", "5"); sentence = sentence.Replace("six", "6");
+                                                sentence = sentence.Replace("seven", "7"); sentence = sentence.Replace("eight", "8"); sentence = sentence.Replace("nine", "9");
+                                                sentence = sentence.Replace("zero", "0"); sentence = sentence.Replace("o", "0");
+                                                sentence = Regex.Replace(sentence, @"[^a-zA-Z0-9]", "");
+                                                string[] digits = Regex.Split(sentence, @"\D+");
+                                                string PhoneNumber = string.Empty;
+
+                                                for (int p = 0; p < digits.Length; p++)
                                                 {
-                                                    PhoneNumber = digits[p];
-                                                }
-                                            }
-                                            else if (digits[p].Length == 3 && digits[p + 1].Length == 3 && digits[p + 2].Length == 4)
-                                            {
-                                                PhoneNumber = digits[p] + digits[p + 1] + digits[p + 2];
-                                            }
-
-                                            else if (digits[p].Length == 3 && digits[p + 1].Length == 7)
-                                            {
-                                                PhoneNumber = digits[p] + digits[p + 1];
-                                            }
-                                        }
-                                        if (PhoneNumber == "")
-                                        {
-                                            sentence = sentence.ToLower(); sentence = sentence.Replace(" ", "").Trim();
-                                            sentence = sentence.Replace("one", "1"); sentence = sentence.Replace("two", "2"); sentence = sentence.Replace("three", "3");
-                                            sentence = sentence.Replace("four", "4"); sentence = sentence.Replace("five", "5"); sentence = sentence.Replace("six", "6");
-                                            sentence = sentence.Replace("seven", "7"); sentence = sentence.Replace("eight", "8"); sentence = sentence.Replace("nine", "9");
-                                            sentence = sentence.Replace("zero", "0"); sentence = sentence.Replace("o", "0");
-
-                                            sentence = Regex.Replace(sentence, @"[^a-zA-Z0-9]", "");
-                                            digits = Regex.Split(sentence, @"\D+");
-                                            string PhoneNumber1 = string.Empty;
-
-                                            for (int p = 0; p < digits.Length; p++)
-                                            {
-                                                if (digits[p].Length == 10)
-                                                {
-                                                    if (sPosting == PhoneNumber)
-                                                    {
-                                                        PhoneNumber = "";
-                                                    }
-                                                    else
+                                                    if (digits[p].Length == 10)
                                                     {
                                                         PhoneNumber = digits[p];
                                                     }
-                                                }
-                                                if (p + 1 < digits.Length)
-                                                {
-                                                    if ((p + 2 < digits.Length))
+                                                    if (digits[p].Length == 11)
                                                     {
-                                                        if (digits[p].Length == 3 && digits[p + 1].Length == 3 && digits[p + 2].Length == 4)
+                                                        PhoneNumber = digits[p].ToString();//.Substring(1);
+                                                        if (PhoneNumber.IndexOf('0') == 0 || PhoneNumber.IndexOf('1') == 0)
+                                                            PhoneNumber = PhoneNumber.Substring(1);
+                                                        else if (PhoneNumber.IndexOf('0') == 10)
+                                                            PhoneNumber = PhoneNumber.Substring(0,10);
+                                                    }
+                                                }
+                                                
+                                                vehicleDesc = vehicleDesc.Replace("http://", "");
+                                                vehicleDesc = vehicleDesc.Replace("<br>", "");
+                                                vehicleDesc = vehicleDesc.Replace("<", "");
+                                                vehicleDesc = vehicleDesc.Replace(">", "");
+                                                vehicleDesc = vehicleDesc.Replace("<a href=", "");
+                                                vehicleDesc = vehicleDesc.Replace("<li>", "");
+                                                vehicleDesc = vehicleDesc.Replace("/", "");
+                                                if (PhoneNumber != "")
+                                                {
+                                                    CollectedFromState = CityN.ToString();
+                                                    string Ttl = string.Empty;
+                                                    Regex title = new Regex("<h2 class=\"postingtitle\">(.*?)</h2>");
+                                                    System.Collections.ArrayList individualtitlemailarraylistURL = new System.Collections.ArrayList();
+                                                    Ttl = content;
+                                                    Ttl = content.Replace('\n', ' ');
+                                                    System.Text.RegularExpressions.MatchCollection regexindividualtitlemailCollecURL = null;
+                                                    regexindividualtitlemailCollecURL = title.Matches(Ttl);
+                                                    individualtitlemailarraylistURL.Clear();
+                                                    individualtitlemailarraylistURL.InsertRange(individualtitlemailarraylistURL.Count, regexindividualtitlemailCollecURL);
+                                                    if (individualtitlemailarraylistURL.Count > 0)
+                                                    {
+                                                        for (int mdl = 0; mdl < individualtitlemailarraylistURL.Count; mdl++)
                                                         {
-                                                            PhoneNumber = digits[p] + digits[p + 1] + digits[p + 2];
-                                                        }
-                                                    }
-                                                    else if (digits[p].Length == 3 && digits[p + 1].Length == 7)
-                                                    {
-                                                        PhoneNumber = digits[p] + digits[p + 1];
-                                                    }
-                                                }
-                                                else if (digits[p].Length == 11)
-                                                {
-                                                    PhoneNumber = digits[p];
-                                                    if (PhoneNumber[0] == 0 || PhoneNumber[0] == 1)
-                                                    {
-                                                        PhoneNumber = PhoneNumber.Substring(1);
-                                                    }
-                                                    else if (PhoneNumber[10] == 0)
-                                                    {
-                                                        PhoneNumber = PhoneNumber.Substring(0, 10);
-                                                    }
-                                                }
+                                                            String Modelcar = individualtitlemailarraylistURL[mdl].ToString();
+                                                            string[] sepem = { "$", "&#x0024;" };
+                                                            string[] msplit = Modelcar.Split(sepem, StringSplitOptions.None);
 
-                                            }
-                                        }
-                                        vehicleDesc = vehicleDesc.Replace("http://", "");
-                                        vehicleDesc = vehicleDesc.Replace("<br>", "");
-                                        vehicleDesc = vehicleDesc.Replace("<", "");
-                                        vehicleDesc = vehicleDesc.Replace(">", "");
-                                        vehicleDesc = vehicleDesc.Replace("<a href=", "");
-                                        vehicleDesc = vehicleDesc.Replace("<li>", "");
-                                        vehicleDesc = vehicleDesc.Replace("/", "");
-                                        if (PhoneNumber != "")
-                                        {
-
-                                            //FillCurrentPageData("http://miami.craigslist.org/pbc/cto/4160044687.html");
-                                            Regex posting = new Regex("<p class=\"postinginfo\">(.*?)</p>");
-                                            System.Collections.ArrayList individualpostingmailarraylistURL = new System.Collections.ArrayList();
-                                            Details = content;
-                                            Details = content.Replace('\n', ' ');
-                                            System.Text.RegularExpressions.MatchCollection regexindividualpostingmailCollecURL = null;
-                                            regexindividualpostingmailCollecURL = posting.Matches(Details);
-                                            individualpostingmailarraylistURL.Clear();
-                                            individualpostingmailarraylistURL.InsertRange(individualpostingmailarraylistURL.Count, regexindividualpostingmailCollecURL);
-                                            if (individualpostingmailarraylistURL.Count > 0)
-                                            {
-                                                sPosting = individualpostingmailarraylistURL[1].ToString();
-                                                sPosting = sPosting.Replace("<p class=\"postinginfo\">", "");
-                                                sPosting = sPosting.Replace("</p>", "");
-                                                sPosting = sPosting.Replace("Posting ID:", "");
-                                                sPosting = sPosting.Replace("post id:", "");
-
-                                            }
-                                            CollectedFromState = CityN.ToString();
-                                            string Ttl = string.Empty;
-                                            Regex title = new Regex("<h2 class=\"postingtitle\">(.*?)</h2>");
-                                            System.Collections.ArrayList individualtitlemailarraylistURL = new System.Collections.ArrayList();
-                                            Ttl = content;
-                                            Ttl = content.Replace('\n', ' ');
-                                            System.Text.RegularExpressions.MatchCollection regexindividualtitlemailCollecURL = null;
-                                            regexindividualtitlemailCollecURL = title.Matches(Ttl);
-                                            individualtitlemailarraylistURL.Clear();
-                                            individualtitlemailarraylistURL.InsertRange(individualtitlemailarraylistURL.Count, regexindividualtitlemailCollecURL);
-                                            if (individualtitlemailarraylistURL.Count > 0)
-                                            {
-                                                for (int mdl = 0; mdl < individualtitlemailarraylistURL.Count; mdl++)
-                                                {
-                                                    String Modelcar = individualtitlemailarraylistURL[mdl].ToString();
-                                                    string[] sepem = { "$", "&#x0024;" };
-                                                    string[] msplit = Modelcar.Split(sepem, StringSplitOptions.None);
-
-                                                    for (int n = 0; n < msplit.Length; n++)
-                                                    {
-                                                        Modellist1 = msplit[0].ToString();
-                                                        if (Modellist1.Contains("</span> "))
-                                                        {
-                                                            int tindex21 = Modellist1.IndexOf("</span>");
-                                                            int etindex21 = Modellist1.Length;
-                                                            string ttl = Modellist1.ToString().Substring(tindex21, etindex21 - tindex21);
-                                                            Modellist1 = ttl.Replace("</span>", "").Trim();
-                                                            Modellist1 = Modellist1.Replace("=&gt;", "").Trim();
-
-                                                            if (msplit.Length > 1)
+                                                            Modellist1 = msplit[0].ToString();
+                                                            if (Modellist1.Contains("</span> "))
                                                             {
-                                                                sprice = msplit[1].ToString();
-                                                                sprice = sprice.Replace("</h2>", "");
-                                                                char[] sepemm = { ' ' };
-                                                                string[] msplit12 = sprice.Split(sepemm);
-                                                                sprice = msplit12[0].ToString();
+                                                                Modellist1 = Modellist1.Substring(Modellist1.IndexOf("</span>")).Replace("</span>", "").Trim();
+                                                                Modellist1 = Modellist1.Replace("=&gt;", "").Trim();
+                                                                Modellist1 = Regex.Replace(Modellist1, "[^a-zA-Z0-9]", " ");
+                                                                year = Regex.Replace(Modellist1, "[^a-zA-Z0-9]", " ");
+                                                                string[] year1 = Regex.Split(year, @"\D+");
+                                                                
+                                                                for (int ab = 0; ab < year1.Length; ab++)
+                                                                {
+                                                                    if (year1[ab].Length == 4)
+                                                                    {
+                                                                        yearCar = year1[ab];
+                                                                    }
+                                                                }
+                                                                if (msplit.Length > 1)
+                                                                {
+                                                                    sprice = msplit[1].ToString();
+                                                                    sprice = sprice.Replace("</h2>", "");
+                                                                    sprice = Regex.Replace(sprice, "[^0-9]", "");
+                                                                }
                                                             }
                                                         }
                                                     }
+
+                                                    #region cusemail
+                                                    //System.Collections.ArrayList vehicleMainDesclist = new System.Collections.ArrayList();
+                                                    //Regex regexobjvehicleMain = new Regex("<section class=\"dateReplyBar\">(.*?)</section>");
+                                                    //str = content;
+                                                    //str = content.Replace('\n', ' ');
+                                                    //System.Text.RegularExpressions.MatchCollection regexvehicleListMain = null;
+                                                    //regexvehicleListMain = regexobjvehicleMain.Matches(str);
+                                                    //vehicleMainDesclist.Clear();
+                                                    //vehicleMainDesclist.InsertRange(vehicleMainDesclist.Count, regexvehicleListMain);
+                                                    //if (vehicleMainDesclist.Count > 0)
+                                                    //{
+                                                    //    CusEmailId = vehicleMainDesclist[0].ToString();
+                                                    //    string[] EmailId = CusEmailId.Split('<');
+                                                    //    CusEmailId = EmailId[9];
+                                                    //    if (CusEmailId.Contains("@"))
+                                                    //    {
+                                                    //        int tindex3 = CusEmailId.IndexOf("mailto:");
+                                                    //        int etindex3 = CusEmailId.IndexOf("?");
+                                                    //        CusEmailId = CusEmailId.ToString().Substring(tindex3, etindex3 - tindex3);
+                                                    //        CusEmailId = CusEmailId.Replace("mailto:", "");
+                                                    //        CusEmailId = CusEmailId.Replace("aside class=\"flags\">", "");
+
+                                                    //    }
+                                                    //}
+                                                    //if (vehicleMainDesclist.Count == 0)
+                                                    //{
+                                                    //    System.Collections.ArrayList vehicleMainDesclist1 = new System.Collections.ArrayList();
+                                                    //    Regex regexobjvehicleMain1 = new Regex("<div id=\"returnemail\">(.*?)</div>");
+                                                    //    str = content;
+                                                    //    str = content.Replace('\n', ' ');
+                                                    //    System.Text.RegularExpressions.MatchCollection regexvehicleListMain1 = null;
+                                                    //    regexvehicleListMain1 = regexobjvehicleMain1.Matches(str);
+                                                    //    vehicleMainDesclist1.Clear();
+                                                    //    vehicleMainDesclist1.InsertRange(vehicleMainDesclist1.Count, regexvehicleListMain1);
+                                                    //    if (vehicleMainDesclist1.Count > 0)
+                                                    //    {
+                                                    //        CusEmailId = vehicleMainDesclist1[0].ToString();
+                                                    //        string[] EmailId = CusEmailId.Split('<');
+                                                    //        CusEmailId = EmailId[9];
+                                                    //        EmailId = CusEmailId.Split('>');
+                                                    //        CusEmailId = EmailId[1];
+                                                    //        CusEmailId = CusEmailId.Replace("aside class=\"flags\">", "");
+                                                    //    }
+                                                    //}
+                                                    //#region old
+                                                    ////String SubURL3 = individualCararraylist[x].ToString();
+                                                    ////int tindex = SubURL3.IndexOf("<a href=");
+                                                    ////int etindex = SubURL3.Length;
+                                                    ////string SubURL1 = SubURL3.ToString().Substring(tindex, etindex - tindex);
+                                                    ////int tindex1 = SubURL1.IndexOf("\"");
+                                                    ////int etindex1 = SubURL1.IndexOf(">");
+                                                    ////string SubURL2 = SubURL1.ToString().Substring(tindex1, etindex1 - tindex1);
+                                                    ////string sMainUrl = SubURL2.Replace("\"", "");
+                                                    ////sMainUrl = "http://" + CityN + ".craigslist.org" + sMainUrl;                              
+                                                    ////FillCurrentPageData(sMainUrl);
+                                                    ////string Ttl = string.Empty;
+                                                    ////Regex title = new Regex("<h2 class=\"postingtitle\">(.*?)</h2>");
+                                                    //// // Regex CarData = new Regex("<section class=\"userbody\">(.*?)</section>(.*?)</section>(.*?)</section>");
+                                                    ////System.Collections.ArrayList individualtitlemailarraylistURL = new System.Collections.ArrayList();
+                                                    ////Ttl = content;
+                                                    ////                        Ttl = content.Replace('\n', ' ');
+                                                    ////                        System.Text.RegularExpressions.MatchCollection regexindividualtitlemailCollecURL = null;
+                                                    ////                        regexindividualtitlemailCollecURL = title.Matches(Ttl);
+                                                    ////                        individualtitlemailarraylistURL.Clear();
+                                                    ////                        individualtitlemailarraylistURL.InsertRange(individualtitlemailarraylistURL.Count, regexindividualtitlemailCollecURL);
+
+
+                                                    ////                        if (individualtitlemailarraylistURL.Count > 0)
+                                                    ////                        {
+                                                    ////                            for (int mdl = 0; mdl < individualtitlemailarraylistURL.Count; mdl++)
+                                                    ////                            {
+                                                    ////                                String Modelcar = individualtitlemailarraylistURL[mdl].ToString();
+                                                    ////                                char[] sepem = { '$' };
+                                                    ////                                string[] msplit = Modelcar.Split(sepem);
+
+                                                    ////                                for (int n = 0; n < msplit.Length; n++)
+                                                    ////                                {
+                                                    ////                                    Modellist1 = msplit[0].ToString();
+                                                    ////                                    if (Modellist1.Contains("</span> "))
+                                                    ////                                    {
+
+                                                    ////                                        int tindex21 = Modellist1.IndexOf("</span>");
+                                                    ////                                        int etindex21 = Modellist1.Length;
+                                                    ////                                        string ttl = Modellist1.ToString().Substring(tindex21, etindex21 - tindex21);
+                                                    ////                                        Modellist1 = ttl.Replace("</span>", "").Trim();
+
+                                                    ////                                        sprice = msplit[1].ToString();
+
+                                                    ////                                        sprice = sprice.Replace("</h2>", "");
+                                                    ////                                        char[] sepemm = { ' ' };
+                                                    ////                                        string[] msplit12 = sprice.Split(sepemm);
+                                                    ////                                        sprice = msplit12[0].ToString();
+
+
+                                                    ////                                    }
+
+                                                    ////                                }
+                                                    ////                            }
+
+
+                                                    ////                            string Details = string.Empty;
+                                                    ////                            Regex CarData = new Regex("<section id=\"postingbody\">(.*?)</section>");
+                                                    ////                            // Regex CarData = new Regex("<section class=\"userbody\">(.*?)</section>(.*?)</section>(.*?)</section>");
+                                                    ////                            System.Collections.ArrayList individualpnslyvmailarraylistURL = new System.Collections.ArrayList();
+                                                    ////                            Details = content;
+                                                    ////                            Details = content.Replace('\n', ' ');
+                                                    ////                            System.Text.RegularExpressions.MatchCollection regexindividualpnslyvmailCollecURL = null;
+                                                    ////                            regexindividualpnslyvmailCollecURL = CarData.Matches(Details);
+                                                    ////                            individualpnslyvmailarraylistURL.Clear();
+                                                    ////                            individualpnslyvmailarraylistURL.InsertRange(individualpnslyvmailarraylistURL.Count, regexindividualpnslyvmailCollecURL);
+
+
+
+
+
+                                                    ////                            string vehicleDesc = string.Empty;
+                                                    ////                            if (individualpnslyvmailarraylistURL.Count != 0)
+                                                    ////                            {
+
+                                                    ////                                vehicleDesc = individualpnslyvmailarraylistURL[0].ToString().Replace("<section id=\"postingbody\">", "");
+                                                    ////                                vehicleDesc = vehicleDesc.Replace("</section>", "");
+                                                    ////                                vehicleDesc = vehicleDesc.Replace("\t", "");
+                                                    ////                                vehicleDesc = vehicleDesc.Replace("<br>", "");
+                                                    ////                            }
+
+                                                    ////                            Regex posting = new Regex("<div class=\"postinginfos\">(.*?)</div>");
+                                                    ////                            // Regex CarData = new Regex("<section class=\"userbody\">(.*?)</section>(.*?)</section>(.*?)</section>");
+                                                    ////                            System.Collections.ArrayList individualpostingmailarraylistURL = new System.Collections.ArrayList();
+                                                    ////                            Details = content;
+                                                    ////                            Details = content.Replace('\n', ' ');
+                                                    ////                            System.Text.RegularExpressions.MatchCollection regexindividualpostingmailCollecURL = null;
+                                                    ////                            regexindividualpostingmailCollecURL = posting.Matches(Details);
+                                                    ////                            individualpostingmailarraylistURL.Clear();
+                                                    ////                            individualpostingmailarraylistURL.InsertRange(individualpostingmailarraylistURL.Count, regexindividualpostingmailCollecURL);
+
+
+                                                    ////                            if (individualpostingmailarraylistURL.Count > 0)
+                                                    ////                            {
+                                                    ////                                String post = individualpostingmailarraylistURL[0].ToString();
+
+                                                    ////                                int tindex2 = post.IndexOf("Posting ID:");
+                                                    ////                                int etindex2 = post.IndexOf("</p>");
+                                                    ////                                sPosting = post.ToString().Substring(tindex2, etindex2 - tindex2);
+                                                    ////                                sPosting = sPosting.Replace("Posting ID:", "");
+
+                                                    ////                            }
+
+                                                    ////                           //string[] sPostingId = sMainUrl.Split('/');
+                                                    ////                            //string sPosting = string.Empty;
+
+                                                    ////                            //if (sPostingId.Length == 6)
+                                                    ////                            //{
+                                                    ////                            //    sPosting = sPostingId[5].Replace(".html", "");
+                                                    ////                            //}
+                                                    ////                            //else if (sPostingId.Length == 5)
+                                                    ////                            //{
+
+                                                    ////                            //    sPosting = sPostingId[4].Replace(".html", "");
+                                                    ////                            //}
+
+                                                    ////                            string CollectedFromState = CityN.ToString();
+
+                                                    ////                            string sentence = vehicleDesc;
+                                                    ////                            //
+                                                    ////                            // Get all digit sequence as strings from data(Description).
+                                                    ////                            //
+                                                    ////                            string[] digits = Regex.Split(sentence, @"\D+");
+
+                                                    ////                            string PhoneNumber = string.Empty;
+
+                                                    ////                            for (int p = 0; p < digits.Length; p++)
+                                                    ////                            {
+                                                    ////                                if ((digits[p].Length == 3 && digits[p + 1].Length == 3 && digits[p + 2].Length == 4) || (digits[p].Length == 10))
+                                                    ////                                {
+                                                    ////                                    if (digits[p].Length == 3 && digits[p + 1].Length == 3 && digits[p + 2].Length == 4)
+                                                    ////                                    {
+                                                    ////                                        PhoneNumber = digits[p] + digits[p + 1] + digits[p + 2];
+
+
+                                                    ////                                    }
+                                                    ////                                    else if (digits[p].Length == 10)
+                                                    ////                                    {
+
+                                                    ////                                        if (sPosting == PhoneNumber)
+                                                    ////                                        {
+                                                    ////                                            PhoneNumber = "";
+                                                    ////                                        }
+                                                    ////                                        else
+                                                    ////                                        {
+                                                    ////                                            PhoneNumber = digits[p];
+
+                                                    ////                                        }
+
+                                                    ////                                    }
+                                                    ////                                }
+                                                    ////                            }
+                                                    ////                            vehicleDesc = vehicleDesc.Replace("http://", "");
+                                                    ////                            vehicleDesc = vehicleDesc.Replace("<br>", "");
+                                                    ////                            vehicleDesc = vehicleDesc.Replace("<", "");
+                                                    ////                            vehicleDesc = vehicleDesc.Replace(">", "");
+                                                    ////                            vehicleDesc = vehicleDesc.Replace("<a href=", "");
+                                                    ////                            vehicleDesc = vehicleDesc.Replace("<li>", "");
+                                                    ////                            vehicleDesc = vehicleDesc.Replace("/", "");
+
+                                                    ////                            string CusEmailId = string.Empty;
+
+                                                    ////                            System.Collections.ArrayList vehicleMainDesclist = new System.Collections.ArrayList();
+                                                    ////                            Regex regexobjvehicleMain = new Regex("<section class=\"dateReplyBar\">(.*?)</section>");
+                                                    ////                            str = content;
+                                                    ////                            str = content.Replace('\n', ' ');
+                                                    ////                            System.Text.RegularExpressions.MatchCollection regexvehicleListMain = null;
+                                                    ////                            regexvehicleListMain = regexobjvehicleMain.Matches(str);
+                                                    ////                            vehicleMainDesclist.Clear();
+                                                    ////                            vehicleMainDesclist.InsertRange(vehicleMainDesclist.Count, regexvehicleListMain);
+
+                                                    ////                            if (vehicleMainDesclist.Count > 0)
+                                                    ////                            {
+                                                    ////                                CusEmailId = vehicleMainDesclist[0].ToString();
+
+                                                    ////                                string[] EmailId = CusEmailId.Split('<');
+                                                    ////                                CusEmailId = EmailId[9];
+                                                    ////                                if (CusEmailId.Contains("@"))
+                                                    ////                                {
+                                                    ////                                    int tindex3 = CusEmailId.IndexOf("mailto:");
+                                                    ////                                    int etindex3 = CusEmailId.IndexOf("?");
+                                                    ////                                    CusEmailId = CusEmailId.ToString().Substring(tindex3, etindex3 - tindex3);
+                                                    ////                                    CusEmailId = CusEmailId.Replace("mailto:", "");
+                                                    ////                                    // CusEmailId = CusEmailId.Replace("", ".org");
+
+
+                                                    ////                                    //EmailId = CusEmailId.Split('>');
+                                                    ////                                    //CusEmailId = EmailId[1];
+                                                    ////                                }
+                                                    ////                            }
+                                                    //#endregion
+                                                    //if (vehicleMainDesclist.Count == 0)
+                                                    //{
+
+                                                    //    System.Collections.ArrayList vehicleMainDesclist1 = new System.Collections.ArrayList();
+                                                    //    Regex regexobjvehicleMain1 = new Regex("<div id=\"returnemail\">(.*?)</div>");
+                                                    //    str = content;
+                                                    //    str = content.Replace('\n', ' ');
+                                                    //    System.Text.RegularExpressions.MatchCollection regexvehicleListMain1 = null;
+                                                    //    regexvehicleListMain1 = regexobjvehicleMain1.Matches(str);
+                                                    //    vehicleMainDesclist1.Clear();
+                                                    //    vehicleMainDesclist1.InsertRange(vehicleMainDesclist1.Count, regexvehicleListMain1);
+
+                                                    //    if (vehicleMainDesclist1.Count > 0)
+                                                    //    {
+                                                    //        CusEmailId = vehicleMainDesclist1[0].ToString();
+
+                                                    //        string[] EmailId = CusEmailId.Split('<');
+                                                    //        CusEmailId = EmailId[9];
+                                                    //        EmailId = CusEmailId.Split('>');
+                                                    //        CusEmailId = EmailId[1];
+                                                    //    }
+
+                                                    //}
+                                                    #endregion
+
                                                 }
+                                                DataSet ds = new DataSet();
+                                                objDal.SaveLead_Craigslist(sprice, Modellist1, vehicleDesc, sMainUrl, sPosting, CollectedFromState, PhoneNumber, StateID, StateN, yearCar);
+                                                varcount = varcount + 1;
+                                                label2.Text = Convert.ToInt32(varcount).ToString();
+                                                #endregion
                                             }
-
-                                            System.Collections.ArrayList vehicleMainDesclist = new System.Collections.ArrayList();
-                                            Regex regexobjvehicleMain = new Regex("<section class=\"dateReplyBar\">(.*?)</section>");
-                                            str = content;
-                                            str = content.Replace('\n', ' ');
-                                            System.Text.RegularExpressions.MatchCollection regexvehicleListMain = null;
-                                            regexvehicleListMain = regexobjvehicleMain.Matches(str);
-                                            vehicleMainDesclist.Clear();
-                                            vehicleMainDesclist.InsertRange(vehicleMainDesclist.Count, regexvehicleListMain);
-                                            if (vehicleMainDesclist.Count > 0)
-                                            {
-                                                CusEmailId = vehicleMainDesclist[0].ToString();
-                                                string[] EmailId = CusEmailId.Split('<');
-                                                CusEmailId = EmailId[9];
-                                                if (CusEmailId.Contains("@"))
-                                                {
-                                                    int tindex3 = CusEmailId.IndexOf("mailto:");
-                                                    int etindex3 = CusEmailId.IndexOf("?");
-                                                    CusEmailId = CusEmailId.ToString().Substring(tindex3, etindex3 - tindex3);
-                                                    CusEmailId = CusEmailId.Replace("mailto:", "");
-                                                    CusEmailId = CusEmailId.Replace("aside class=\"flags\">", "");
-
-                                                }
-                                            }
-                                            if (vehicleMainDesclist.Count == 0)
-                                            {
-                                                System.Collections.ArrayList vehicleMainDesclist1 = new System.Collections.ArrayList();
-                                                Regex regexobjvehicleMain1 = new Regex("<div id=\"returnemail\">(.*?)</div>");
-                                                str = content;
-                                                str = content.Replace('\n', ' ');
-                                                System.Text.RegularExpressions.MatchCollection regexvehicleListMain1 = null;
-                                                regexvehicleListMain1 = regexobjvehicleMain1.Matches(str);
-                                                vehicleMainDesclist1.Clear();
-                                                vehicleMainDesclist1.InsertRange(vehicleMainDesclist1.Count, regexvehicleListMain1);
-                                                if (vehicleMainDesclist1.Count > 0)
-                                                {
-                                                    CusEmailId = vehicleMainDesclist1[0].ToString();
-                                                    string[] EmailId = CusEmailId.Split('<');
-                                                    CusEmailId = EmailId[9];
-                                                    EmailId = CusEmailId.Split('>');
-                                                    CusEmailId = EmailId[1];
-                                                    CusEmailId = CusEmailId.Replace("aside class=\"flags\">", "");
-                                                }
-                                            }
-                                            #region old
-                                            //String SubURL3 = individualCararraylist[x].ToString();
-                                            //int tindex = SubURL3.IndexOf("<a href=");
-                                            //int etindex = SubURL3.Length;
-                                            //string SubURL1 = SubURL3.ToString().Substring(tindex, etindex - tindex);
-                                            //int tindex1 = SubURL1.IndexOf("\"");
-                                            //int etindex1 = SubURL1.IndexOf(">");
-                                            //string SubURL2 = SubURL1.ToString().Substring(tindex1, etindex1 - tindex1);
-                                            //string sMainUrl = SubURL2.Replace("\"", "");
-                                            //sMainUrl = "http://" + CityN + ".craigslist.org" + sMainUrl;                              
-                                            //FillCurrentPageData(sMainUrl);
-                                            //string Ttl = string.Empty;
-                                            //Regex title = new Regex("<h2 class=\"postingtitle\">(.*?)</h2>");
-                                            // // Regex CarData = new Regex("<section class=\"userbody\">(.*?)</section>(.*?)</section>(.*?)</section>");
-                                            //System.Collections.ArrayList individualtitlemailarraylistURL = new System.Collections.ArrayList();
-                                            //Ttl = content;
-                                            //                        Ttl = content.Replace('\n', ' ');
-                                            //                        System.Text.RegularExpressions.MatchCollection regexindividualtitlemailCollecURL = null;
-                                            //                        regexindividualtitlemailCollecURL = title.Matches(Ttl);
-                                            //                        individualtitlemailarraylistURL.Clear();
-                                            //                        individualtitlemailarraylistURL.InsertRange(individualtitlemailarraylistURL.Count, regexindividualtitlemailCollecURL);
-
-
-                                            //                        if (individualtitlemailarraylistURL.Count > 0)
-                                            //                        {
-                                            //                            for (int mdl = 0; mdl < individualtitlemailarraylistURL.Count; mdl++)
-                                            //                            {
-                                            //                                String Modelcar = individualtitlemailarraylistURL[mdl].ToString();
-                                            //                                char[] sepem = { '$' };
-                                            //                                string[] msplit = Modelcar.Split(sepem);
-
-                                            //                                for (int n = 0; n < msplit.Length; n++)
-                                            //                                {
-                                            //                                    Modellist1 = msplit[0].ToString();
-                                            //                                    if (Modellist1.Contains("</span> "))
-                                            //                                    {
-
-                                            //                                        int tindex21 = Modellist1.IndexOf("</span>");
-                                            //                                        int etindex21 = Modellist1.Length;
-                                            //                                        string ttl = Modellist1.ToString().Substring(tindex21, etindex21 - tindex21);
-                                            //                                        Modellist1 = ttl.Replace("</span>", "").Trim();
-
-                                            //                                        sprice = msplit[1].ToString();
-
-                                            //                                        sprice = sprice.Replace("</h2>", "");
-                                            //                                        char[] sepemm = { ' ' };
-                                            //                                        string[] msplit12 = sprice.Split(sepemm);
-                                            //                                        sprice = msplit12[0].ToString();
-
-
-                                            //                                    }
-
-                                            //                                }
-                                            //                            }
-
-
-                                            //                            string Details = string.Empty;
-                                            //                            Regex CarData = new Regex("<section id=\"postingbody\">(.*?)</section>");
-                                            //                            // Regex CarData = new Regex("<section class=\"userbody\">(.*?)</section>(.*?)</section>(.*?)</section>");
-                                            //                            System.Collections.ArrayList individualpnslyvmailarraylistURL = new System.Collections.ArrayList();
-                                            //                            Details = content;
-                                            //                            Details = content.Replace('\n', ' ');
-                                            //                            System.Text.RegularExpressions.MatchCollection regexindividualpnslyvmailCollecURL = null;
-                                            //                            regexindividualpnslyvmailCollecURL = CarData.Matches(Details);
-                                            //                            individualpnslyvmailarraylistURL.Clear();
-                                            //                            individualpnslyvmailarraylistURL.InsertRange(individualpnslyvmailarraylistURL.Count, regexindividualpnslyvmailCollecURL);
-
-
-
-
-
-                                            //                            string vehicleDesc = string.Empty;
-                                            //                            if (individualpnslyvmailarraylistURL.Count != 0)
-                                            //                            {
-
-                                            //                                vehicleDesc = individualpnslyvmailarraylistURL[0].ToString().Replace("<section id=\"postingbody\">", "");
-                                            //                                vehicleDesc = vehicleDesc.Replace("</section>", "");
-                                            //                                vehicleDesc = vehicleDesc.Replace("\t", "");
-                                            //                                vehicleDesc = vehicleDesc.Replace("<br>", "");
-                                            //                            }
-
-                                            //                            Regex posting = new Regex("<div class=\"postinginfos\">(.*?)</div>");
-                                            //                            // Regex CarData = new Regex("<section class=\"userbody\">(.*?)</section>(.*?)</section>(.*?)</section>");
-                                            //                            System.Collections.ArrayList individualpostingmailarraylistURL = new System.Collections.ArrayList();
-                                            //                            Details = content;
-                                            //                            Details = content.Replace('\n', ' ');
-                                            //                            System.Text.RegularExpressions.MatchCollection regexindividualpostingmailCollecURL = null;
-                                            //                            regexindividualpostingmailCollecURL = posting.Matches(Details);
-                                            //                            individualpostingmailarraylistURL.Clear();
-                                            //                            individualpostingmailarraylistURL.InsertRange(individualpostingmailarraylistURL.Count, regexindividualpostingmailCollecURL);
-
-
-                                            //                            if (individualpostingmailarraylistURL.Count > 0)
-                                            //                            {
-                                            //                                String post = individualpostingmailarraylistURL[0].ToString();
-
-                                            //                                int tindex2 = post.IndexOf("Posting ID:");
-                                            //                                int etindex2 = post.IndexOf("</p>");
-                                            //                                sPosting = post.ToString().Substring(tindex2, etindex2 - tindex2);
-                                            //                                sPosting = sPosting.Replace("Posting ID:", "");
-
-                                            //                            }
-
-                                            //                           //string[] sPostingId = sMainUrl.Split('/');
-                                            //                            //string sPosting = string.Empty;
-
-                                            //                            //if (sPostingId.Length == 6)
-                                            //                            //{
-                                            //                            //    sPosting = sPostingId[5].Replace(".html", "");
-                                            //                            //}
-                                            //                            //else if (sPostingId.Length == 5)
-                                            //                            //{
-
-                                            //                            //    sPosting = sPostingId[4].Replace(".html", "");
-                                            //                            //}
-
-                                            //                            string CollectedFromState = CityN.ToString();
-
-                                            //                            string sentence = vehicleDesc;
-                                            //                            //
-                                            //                            // Get all digit sequence as strings from data(Description).
-                                            //                            //
-                                            //                            string[] digits = Regex.Split(sentence, @"\D+");
-
-                                            //                            string PhoneNumber = string.Empty;
-
-                                            //                            for (int p = 0; p < digits.Length; p++)
-                                            //                            {
-                                            //                                if ((digits[p].Length == 3 && digits[p + 1].Length == 3 && digits[p + 2].Length == 4) || (digits[p].Length == 10))
-                                            //                                {
-                                            //                                    if (digits[p].Length == 3 && digits[p + 1].Length == 3 && digits[p + 2].Length == 4)
-                                            //                                    {
-                                            //                                        PhoneNumber = digits[p] + digits[p + 1] + digits[p + 2];
-
-
-                                            //                                    }
-                                            //                                    else if (digits[p].Length == 10)
-                                            //                                    {
-
-                                            //                                        if (sPosting == PhoneNumber)
-                                            //                                        {
-                                            //                                            PhoneNumber = "";
-                                            //                                        }
-                                            //                                        else
-                                            //                                        {
-                                            //                                            PhoneNumber = digits[p];
-
-                                            //                                        }
-
-                                            //                                    }
-                                            //                                }
-                                            //                            }
-                                            //                            vehicleDesc = vehicleDesc.Replace("http://", "");
-                                            //                            vehicleDesc = vehicleDesc.Replace("<br>", "");
-                                            //                            vehicleDesc = vehicleDesc.Replace("<", "");
-                                            //                            vehicleDesc = vehicleDesc.Replace(">", "");
-                                            //                            vehicleDesc = vehicleDesc.Replace("<a href=", "");
-                                            //                            vehicleDesc = vehicleDesc.Replace("<li>", "");
-                                            //                            vehicleDesc = vehicleDesc.Replace("/", "");
-
-                                            //                            string CusEmailId = string.Empty;
-
-                                            //                            System.Collections.ArrayList vehicleMainDesclist = new System.Collections.ArrayList();
-                                            //                            Regex regexobjvehicleMain = new Regex("<section class=\"dateReplyBar\">(.*?)</section>");
-                                            //                            str = content;
-                                            //                            str = content.Replace('\n', ' ');
-                                            //                            System.Text.RegularExpressions.MatchCollection regexvehicleListMain = null;
-                                            //                            regexvehicleListMain = regexobjvehicleMain.Matches(str);
-                                            //                            vehicleMainDesclist.Clear();
-                                            //                            vehicleMainDesclist.InsertRange(vehicleMainDesclist.Count, regexvehicleListMain);
-
-                                            //                            if (vehicleMainDesclist.Count > 0)
-                                            //                            {
-                                            //                                CusEmailId = vehicleMainDesclist[0].ToString();
-
-                                            //                                string[] EmailId = CusEmailId.Split('<');
-                                            //                                CusEmailId = EmailId[9];
-                                            //                                if (CusEmailId.Contains("@"))
-                                            //                                {
-                                            //                                    int tindex3 = CusEmailId.IndexOf("mailto:");
-                                            //                                    int etindex3 = CusEmailId.IndexOf("?");
-                                            //                                    CusEmailId = CusEmailId.ToString().Substring(tindex3, etindex3 - tindex3);
-                                            //                                    CusEmailId = CusEmailId.Replace("mailto:", "");
-                                            //                                    // CusEmailId = CusEmailId.Replace("", ".org");
-
-
-                                            //                                    //EmailId = CusEmailId.Split('>');
-                                            //                                    //CusEmailId = EmailId[1];
-                                            //                                }
-                                            //                            }
-                                            #endregion
-                                            if (vehicleMainDesclist.Count == 0)
-                                            {
-
-                                                System.Collections.ArrayList vehicleMainDesclist1 = new System.Collections.ArrayList();
-                                                Regex regexobjvehicleMain1 = new Regex("<div id=\"returnemail\">(.*?)</div>");
-                                                str = content;
-                                                str = content.Replace('\n', ' ');
-                                                System.Text.RegularExpressions.MatchCollection regexvehicleListMain1 = null;
-                                                regexvehicleListMain1 = regexobjvehicleMain1.Matches(str);
-                                                vehicleMainDesclist1.Clear();
-                                                vehicleMainDesclist1.InsertRange(vehicleMainDesclist1.Count, regexvehicleListMain1);
-
-                                                if (vehicleMainDesclist1.Count > 0)
-                                                {
-                                                    CusEmailId = vehicleMainDesclist1[0].ToString();
-
-                                                    string[] EmailId = CusEmailId.Split('<');
-                                                    CusEmailId = EmailId[9];
-                                                    EmailId = CusEmailId.Split('>');
-                                                    CusEmailId = EmailId[1];
-                                                }
-
-                                            }
-
                                         }
-                                        DataSet ds = new DataSet();
-                                        objDal.SaveLead_Craigslist(sprice, Modellist1, vehicleDesc, sMainUrl, sPosting, CollectedFromState, PhoneNumber, StateID, StateN, CusEmailId);
-                                        varcount = varcount + 1;
-                                        label2.Text = Convert.ToInt32(varcount).ToString();
-
-                                        //if (varcount > 3)
-                                        //{
-                                        //    return;
-                                        //}
                                         #endregion
                                     }
+                                    else return;
                                 }
                             }
                             else return;
+                            #endregion
+
                         }
+                        else return;
                     }
-                    else return;
+                    catch (Exception)
+                    {
+                    }
                 }
             }
         }
@@ -4269,14 +4205,12 @@ namespace Leads_App
         #region ClassifiedsCiti
         public void GetClassifiedsCitiLeads()
         {
-            string str = "";
+            string str = ""; string date = "";
             for (int p = 1; p < 716; p++)
             {
                 string mainurl = "http://www.classifiedsciti.com/cars-amp-bikes/cars/USA/" + p;
                 #region tot
                 FillCurrentPageData(mainurl);
-
-
                 Regex regexindividual3 = new Regex("<h2>(.*?)</h2>");
                 str = content;
                 str = content.Replace('\n', ' ');
@@ -4286,142 +4220,307 @@ namespace Leads_App
                 individualCararraylist3.Clear();
                 individualCararraylist3.InsertRange(individualCararraylist3.Count, regexindividualCollec3);
 
-                for (int dj = 0; dj < individualCararraylist3.Count - 1; dj++)
+
+                Regex regexindividual = new Regex("<span class=\"post-date\">(.*?)</span>");
+                System.Collections.ArrayList individualCararraylist = new System.Collections.ArrayList();
+                str = content;
+                str = content.Replace('\n', ' ');
+                System.Text.RegularExpressions.MatchCollection regexindividualCollec = null;
+                regexindividualCollec = regexindividual.Matches(str);
+                individualCararraylist.Clear();
+                individualCararraylist.InsertRange(individualCararraylist.Count, regexindividualCollec);
+
+                for (int y = 0; y < individualCararraylist.Count; y++)
                 {
-                    string desc = ""; string title = ""; string details = "";
-                    string pubDate = ""; string name = ""; string price = "";
-                    string location = ""; string place = ""; string phno = string.Empty;
-                    string city = ""; string state = "";
 
-                    #region fetch
-                    string url = individualCararraylist3[dj].ToString();
+                    date = individualCararraylist[y].ToString().Replace("<span class=\"post-date\">", "");
+                    date = date.Replace("</span>", "");
 
-                    url = url.Substring(url.IndexOf("href="));
-                    url = url.Replace("href=", "");
-                    url = url.Substring(0, url.IndexOf("rel"));
-                    //url = url.Replace(">", "");
-                    url = url.Replace("\"", "");
-
-                    FillCurrentPageData(url);
-
-                    Regex r1 = new Regex("<div>(.*?)<div class=\"addthis_toolbox addthis_default_style\">(.*?)</div>");
-                    System.Collections.ArrayList al1 = new System.Collections.ArrayList();
-                    str = content;
-                    str = content.Replace('\n', ' ');
-                    System.Text.RegularExpressions.MatchCollection mc1 = null;
-                    mc1 = r1.Matches(str);
-                    al1.Clear();
-                    al1.InsertRange(al1.Count, mc1);
-                    for (int x = 0; x < al1.Count; x++)
+                    string[] date1 = date.Split('-');
+                    date = date1[1] + "-" + date1[0] + "-" + date1[2];
+                    DateTime new1 = DateTime.Parse(date);
+                    new1 = new1.Date + ts;
+                    if (!(new1 >= edate && new1 <= sdate))
                     {
-                        desc = al1[x].ToString();
-                        desc = desc.Replace("<div>", "");
-                        desc = desc.Replace("</div>", "");
-                        desc = desc.Substring(0, desc.IndexOf("<!-- AddThis Button BEGIN -->"));
+                        return;
+                    }
+                    else
+                    {
+                        string desc = ""; string title = ""; string details = "";
+                        string pubDate = ""; string name = ""; string price = "";
+                        string location = ""; string place = ""; string phno = string.Empty;
+                        string city = ""; string state = "";
 
-                        string phone = Regex.Replace(desc, "[A-Za-z]", "");
+                        #region fetch
+                        string url = individualCararraylist3[y].ToString();
 
-                        string[] digits = Regex.Split(phone, @"\D+");
+                        url = url.Substring(url.IndexOf("href="));
+                        url = url.Replace("href=", "");
+                        url = url.Substring(0, url.IndexOf("rel"));
+                        //url = url.Replace(">", "");
+                        url = url.Replace("\"", "");
 
-                        for (int ph = 0; ph < digits.Length; ph++)
+                        FillCurrentPageData(url);
+
+                        Regex r1 = new Regex("<div>(.*?)<div class=\"addthis_toolbox addthis_default_style\">(.*?)</div>");
+                        System.Collections.ArrayList al1 = new System.Collections.ArrayList();
+                        str = content;
+                        str = content.Replace('\n', ' ');
+                        System.Text.RegularExpressions.MatchCollection mc1 = null;
+                        mc1 = r1.Matches(str);
+                        al1.Clear();
+                        al1.InsertRange(al1.Count, mc1);
+                        for (int x = 0; x < al1.Count; x++)
                         {
-                            if (digits[ph].Length == 10)
-                            {
-                                phno = digits[ph];
-                            }
-                            else if (digits[ph].Length == 3 && digits[ph + 1].Length == 3 && digits[ph + 2].Length == 4)
-                            {
-                                phno = digits[ph] + digits[ph + 1] + digits[ph + 2];
-                            }
+                            desc = al1[x].ToString();
+                            desc = desc.Replace("<div>", "");
+                            desc = desc.Replace("</div>", "");
+                            desc = desc.Substring(0, desc.IndexOf("<!-- AddThis Button BEGIN -->"));
 
-                            else if (digits[ph].Length == 3 && digits[ph + 1].Length == 7)
+                            string phone = Regex.Replace(desc, "[A-Za-z]", "");
+
+                            string[] digits = Regex.Split(phone, @"\D+");
+
+                            for (int ph = 0; ph < digits.Length; ph++)
                             {
-                                phno = digits[ph] + digits[ph + 1];
+                                if (digits[ph].Length == 10)
+                                {
+                                    phno = digits[ph];
+                                }
+                                else if (digits[ph].Length == 3 && digits[ph + 1].Length == 3 && digits[ph + 2].Length == 4)
+                                {
+                                    phno = digits[ph] + digits[ph + 1] + digits[ph + 2];
+                                }
+
+                                else if (digits[ph].Length == 3 && digits[ph + 1].Length == 7)
+                                {
+                                    phno = digits[ph] + digits[ph + 1];
+                                }
                             }
                         }
+
+                        Regex r2 = new Regex("<p>(.*?)</p>");
+                        System.Collections.ArrayList al2 = new System.Collections.ArrayList();
+                        str = content;
+                        str = content.Replace('\n', ' ');
+                        System.Text.RegularExpressions.MatchCollection mc2 = null;
+                        mc2 = r2.Matches(str);
+                        al2.Clear();
+                        al2.InsertRange(al2.Count, mc2);
+
+                        details = al2[0].ToString();
+                        string[] det = details.Split('|');
+                        for (int i = 0; i < det.Length; i++)
+                        {
+                            if (det[i].Contains("Publish Date:"))
+                            {
+                                pubDate = det[i];
+                                pubDate = pubDate.Substring(pubDate.IndexOf(":"));
+                                pubDate = pubDate.Replace(":", "");
+                                pubDate = pubDate.Replace("</b>", "");
+                            }
+                            else if (det[i].Contains("Contact name:"))
+                            {
+                                name = det[i];
+                                name = name.Substring(name.IndexOf(":"));
+                                name = name.Replace(":", "");
+                                name = name.Replace("</b>", "");
+                            }
+                            else if (det[i].Contains("Location:"))
+                            {
+                                location = det[i];
+                                location = location.Substring(location.IndexOf(":"));
+                                location = location.Replace(":", "");
+                                location = location.Replace("</b>", "");
+                            }
+                            else if (det[i].Contains("Place:"))
+                            {
+                                place = det[i];
+                                place = place.Substring(place.IndexOf(":"));
+                                place = place.Replace(":", "");
+                                place = place.Replace("</b>", "");
+                                place = place.Replace("\t", "");
+                                if (place.IndexOf(",") != -1)
+                                    city = place.Substring(0, place.IndexOf(","));
+                                else
+                                    city = place;
+                                state = place.Replace(city, "");
+                                state = state.Replace(",", "");
+                                state = Regex.Replace(state, "[0-9]", "");
+                            }
+                        }
+
+                        Regex r3 = new Regex("<h1>(.*?)</h1>");
+                        System.Collections.ArrayList al3 = new System.Collections.ArrayList();
+                        str = content;
+                        str = content.Replace('\n', ' ');
+                        System.Text.RegularExpressions.MatchCollection mc3 = null;
+                        mc3 = r3.Matches(str);
+                        al3.Clear();
+                        al3.InsertRange(al3.Count, mc3);
+                        for (int x = 0; x < al3.Count; x++)
+                        {
+                            title = al3[x].ToString();
+                            title = title.Replace("<h1>", "");
+                            title = title.Replace("</h1>", "");
+                            if (title.IndexOf("-") != -1)
+                            {
+                                price = title.Substring(title.IndexOf("-"));
+                                price = price.Replace("-", "");
+                            }
+                        }
+
+                        #endregion
+                        #region Save
+                        //objDal.SaveLead_ClassifiedsCiti(title, desc, location, state,city, name, phno, price, url);
+                        objDal.SaveLeadsData("", "", title, phno, price, url, name, state, city, location, "", "", "", desc, "", "", "", "", "", "", "", "");
+                        label2.Text = (int.Parse(label2.Text) + 1).ToString();
+                        #endregion
+
                     }
 
-                    Regex r2 = new Regex("<p>(.*?)</p>");
-                    System.Collections.ArrayList al2 = new System.Collections.ArrayList();
-                    str = content;
-                    str = content.Replace('\n', ' ');
-                    System.Text.RegularExpressions.MatchCollection mc2 = null;
-                    mc2 = r2.Matches(str);
-                    al2.Clear();
-                    al2.InsertRange(al2.Count, mc2);
-
-                    details = al2[0].ToString();
-                    string[] det = details.Split('|');
-                    for (int i = 0; i < det.Length; i++)
-                    {
-                        if (det[i].Contains("Publish Date:"))
-                        {
-                            pubDate = det[i];
-                            pubDate = pubDate.Substring(pubDate.IndexOf(":"));
-                            pubDate = pubDate.Replace(":", "");
-                            pubDate = pubDate.Replace("</b>", "");
-                        }
-                        else if (det[i].Contains("Contact name:"))
-                        {
-                            name = det[i];
-                            name = name.Substring(name.IndexOf(":"));
-                            name = name.Replace(":", "");
-                            name = name.Replace("</b>", "");
-                        }
-                        else if (det[i].Contains("Location:"))
-                        {
-                            location = det[i];
-                            location = location.Substring(location.IndexOf(":"));
-                            location = location.Replace(":", "");
-                            location = location.Replace("</b>", "");
-                        }
-                        else if (det[i].Contains("Place:"))
-                        {
-                            place = det[i];
-                            place = place.Substring(place.IndexOf(":"));
-                            place = place.Replace(":", "");
-                            place = place.Replace("</b>", "");
-                            place = place.Replace("\t", "");
-                            if (place.IndexOf(",") != -1)
-                                city = place.Substring(0, place.IndexOf(","));
-                            else
-                                city = place;
-                            state = place.Replace(city, "");
-                            state = state.Replace(",", "");
-                            state = Regex.Replace(state, "[0-9]", "");
-                        }
-                    }
-
-                    Regex r3 = new Regex("<h1>(.*?)</h1>");
-                    System.Collections.ArrayList al3 = new System.Collections.ArrayList();
-                    str = content;
-                    str = content.Replace('\n', ' ');
-                    System.Text.RegularExpressions.MatchCollection mc3 = null;
-                    mc3 = r3.Matches(str);
-                    al3.Clear();
-                    al3.InsertRange(al3.Count, mc3);
-                    for (int x = 0; x < al3.Count; x++)
-                    {
-                        title = al3[x].ToString();
-                        title = title.Replace("<h1>", "");
-                        title = title.Replace("</h1>", "");
-                        if (title.IndexOf("-") != -1)
-                        {
-                            price = title.Substring(title.IndexOf("-"));
-                            price = price.Replace("-", "");
-                        }
-                    }
-
-                    #endregion
-                    #region Save
-                    //objDal.SaveLead_ClassifiedsCiti(title, desc, location, state,city, name, phno, price, url);
-                    objDal.SaveLeadsData("", "", title, phno, price, url, name, state, city, location, "", "", "", desc, "", "", "", "", "", "", "", "");
-                    label2.Text = (int.Parse(label2.Text) + 1).ToString();
-                    #endregion
                 }
+
+
+                #region old
+                //for (int dj = 0; dj < individualCararraylist3.Count - 1; dj++)
+                //{
+                //    string desc = ""; string title = ""; string details = "";
+                //    string pubDate = ""; string name = ""; string price = "";
+                //    string location = ""; string place = ""; string phno = string.Empty;
+                //    string city = ""; string state = "";
+
+                //    #region fetch
+                //    string url = individualCararraylist3[dj].ToString();
+
+                //    url = url.Substring(url.IndexOf("href="));
+                //    url = url.Replace("href=", "");
+                //    url = url.Substring(0, url.IndexOf("rel"));
+                //    //url = url.Replace(">", "");
+                //    url = url.Replace("\"", "");
+
+                //    FillCurrentPageData(url);
+
+                //    Regex r1 = new Regex("<div>(.*?)<div class=\"addthis_toolbox addthis_default_style\">(.*?)</div>");
+                //    System.Collections.ArrayList al1 = new System.Collections.ArrayList();
+                //    str = content;
+                //    str = content.Replace('\n', ' ');
+                //    System.Text.RegularExpressions.MatchCollection mc1 = null;
+                //    mc1 = r1.Matches(str);
+                //    al1.Clear();
+                //    al1.InsertRange(al1.Count, mc1);
+                //    for (int x = 0; x < al1.Count; x++)
+                //    {
+                //        desc = al1[x].ToString();
+                //        desc = desc.Replace("<div>", "");
+                //        desc = desc.Replace("</div>", "");
+                //        desc = desc.Substring(0, desc.IndexOf("<!-- AddThis Button BEGIN -->"));
+
+                //        string phone = Regex.Replace(desc, "[A-Za-z]", "");
+
+                //        string[] digits = Regex.Split(phone, @"\D+");
+
+                //        for (int ph = 0; ph < digits.Length; ph++)
+                //        {
+                //            if (digits[ph].Length == 10)
+                //            {
+                //                phno = digits[ph];
+                //            }
+                //            else if (digits[ph].Length == 3 && digits[ph + 1].Length == 3 && digits[ph + 2].Length == 4)
+                //            {
+                //                phno = digits[ph] + digits[ph + 1] + digits[ph + 2];
+                //            }
+
+                //            else if (digits[ph].Length == 3 && digits[ph + 1].Length == 7)
+                //            {
+                //                phno = digits[ph] + digits[ph + 1];
+                //            }
+                //        }
+                //    }
+
+                //    Regex r2 = new Regex("<p>(.*?)</p>");
+                //    System.Collections.ArrayList al2 = new System.Collections.ArrayList();
+                //    str = content;
+                //    str = content.Replace('\n', ' ');
+                //    System.Text.RegularExpressions.MatchCollection mc2 = null;
+                //    mc2 = r2.Matches(str);
+                //    al2.Clear();
+                //    al2.InsertRange(al2.Count, mc2);
+
+                //    details = al2[0].ToString();
+                //    string[] det = details.Split('|');
+                //    for (int i = 0; i < det.Length; i++)
+                //    {
+                //        if (det[i].Contains("Publish Date:"))
+                //        {
+                //            pubDate = det[i];
+                //            pubDate = pubDate.Substring(pubDate.IndexOf(":"));
+                //            pubDate = pubDate.Replace(":", "");
+                //            pubDate = pubDate.Replace("</b>", "");
+                //        }
+                //        else if (det[i].Contains("Contact name:"))
+                //        {
+                //            name = det[i];
+                //            name = name.Substring(name.IndexOf(":"));
+                //            name = name.Replace(":", "");
+                //            name = name.Replace("</b>", "");
+                //        }
+                //        else if (det[i].Contains("Location:"))
+                //        {
+                //            location = det[i];
+                //            location = location.Substring(location.IndexOf(":"));
+                //            location = location.Replace(":", "");
+                //            location = location.Replace("</b>", "");
+                //        }
+                //        else if (det[i].Contains("Place:"))
+                //        {
+                //            place = det[i];
+                //            place = place.Substring(place.IndexOf(":"));
+                //            place = place.Replace(":", "");
+                //            place = place.Replace("</b>", "");
+                //            place = place.Replace("\t", "");
+                //            if (place.IndexOf(",") != -1)
+                //                city = place.Substring(0, place.IndexOf(","));
+                //            else
+                //                city = place;
+                //            state = place.Replace(city, "");
+                //            state = state.Replace(",", "");
+                //            state = Regex.Replace(state, "[0-9]", "");
+                //        }
+                //    }
+
+                //    Regex r3 = new Regex("<h1>(.*?)</h1>");
+                //    System.Collections.ArrayList al3 = new System.Collections.ArrayList();
+                //    str = content;
+                //    str = content.Replace('\n', ' ');
+                //    System.Text.RegularExpressions.MatchCollection mc3 = null;
+                //    mc3 = r3.Matches(str);
+                //    al3.Clear();
+                //    al3.InsertRange(al3.Count, mc3);
+                //    for (int x = 0; x < al3.Count; x++)
+                //    {
+                //        title = al3[x].ToString();
+                //        title = title.Replace("<h1>", "");
+                //        title = title.Replace("</h1>", "");
+                //        if (title.IndexOf("-") != -1)
+                //        {
+                //            price = title.Substring(title.IndexOf("-"));
+                //            price = price.Replace("-", "");
+                //        }
+                //    }
+
+                //    #endregion
+                //    #region Save
+                //    //objDal.SaveLead_ClassifiedsCiti(title, desc, location, state,city, name, phno, price, url);
+                //    objDal.SaveLeadsData("", "", title, phno, price, url, name, state, city, location, "", "", "", desc, "", "", "", "", "", "", "", "");
+                //    label2.Text = (int.Parse(label2.Text) + 1).ToString();
+                //    #endregion
+                //}
+                #endregion
+
                 #endregion
             }
-            MessageBox.Show("Leads Collected Successfully For ClassifiedsCiti Site");
+            //MessageBox.Show("Leads Collected Successfully For ClassifiedsCiti Site");
         }
         #endregion
         private void Load_Zip_ByState_Cars()
@@ -4499,7 +4598,7 @@ namespace Leads_App
             dsStated = objDal.GET_STATES_Craiglistcars();
 
             cmbState.DataSource = dsStated;
-            cmbState.DisplayMember = "Table.STATE_NAME";
+            cmbState.DisplayMember = "Table.STATE";
             cmbState.ValueMember = "Table.STATE_ID";
             cmbState.Visible = true;
             cmbState.BringToFront();
@@ -4597,8 +4696,8 @@ namespace Leads_App
 
         private void btnStart_Click(object sender, EventArgs e)
         {
-            try
-            {
+            //try
+            //{
                 if (cboWebsite.Text == "Select")
                 {
                     MessageBox.Show("Please select Site.");
@@ -4631,6 +4730,7 @@ namespace Leads_App
                                 { continue; }
                                 dsCities = objDal.GetCities(Convert.ToInt32(dsStated.Tables[0].Rows[i]["State_Id"]));
                                 objDal.SaveTransaction_Cars(Convert.ToInt32(dsStated.Tables[0].Rows[i]["State_Id"]), "1", "0");
+                                cmbState.Text = dsStated.Tables[0].Rows[i]["state"].ToString();
                                 SessionStateid = Convert.ToInt32(dsStated.Tables[0].Rows[i]["State_Id"]);
                                 if (SessionStateid == 44)
                                 {
@@ -4650,9 +4750,9 @@ namespace Leads_App
                                                 {
                                                     txt_cityname.Text = dsCities.Tables[0].Rows[p]["cityname"].ToString();
                                                     label5.Text = (p + 1).ToString();
-                                                    objDal.SaveTransaction_Cars(dsStated.Tables[0].Rows[i]["State_name"].ToString(), dsCities.Tables[0].Rows[p]["cityname"].ToString(), "1", "0");
-                                                    GetLeadsForcraigslist(dsStated.Tables[0].Rows[i]["State_name"].ToString(), dsCities.Tables[0].Rows[p]["cityname"].ToString(), Convert.ToInt32(dsStated.Tables[0].Rows[i]["State_Id"]));
-                                                    objDal.SaveTransaction_Cars(dsStated.Tables[0].Rows[i]["State_name"].ToString(), dsCities.Tables[0].Rows[p]["cityname"].ToString(), "1", "1");
+                                                    objDal.SaveTransaction_Cars(dsStated.Tables[0].Rows[i]["State"].ToString(), dsCities.Tables[0].Rows[p]["cityname"].ToString(), "1", "0");
+                                                    GetLeadsForcraigslist(dsStated.Tables[0].Rows[i]["State"].ToString(), dsCities.Tables[0].Rows[p]["cityname"].ToString(), Convert.ToInt32(dsStated.Tables[0].Rows[i]["State_Id"]));
+                                                    objDal.SaveTransaction_Cars(dsStated.Tables[0].Rows[i]["State"].ToString(), dsCities.Tables[0].Rows[p]["cityname"].ToString(), "1", "1");
                                                 }
                                                 else
                                                     return;
@@ -4957,11 +5057,11 @@ namespace Leads_App
                 }
                 
                 
-            }
-            catch (Exception ex)
-           {
-              MessageBox.Show(ex.ToString());
-           }
+           // }
+           // catch (Exception ex)
+           //{
+           //   MessageBox.Show(ex.ToString());
+           //}
         }
         private void btnEnd_Click(object sender, EventArgs e)
         {
